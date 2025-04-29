@@ -1,4 +1,4 @@
--- Naming convention: schema.source_filename
+-- Naming convention: Schema.Source_Filename
 
 -- Create crm_cust_info
 IF OBJECT_ID('bronze.crm_cust_info','U') IS NOT NULL
