@@ -1,3 +1,15 @@
+/*
+===============================================================================
+StoredProcedure: Load Bronze Layer (DataSource -> Bronze)
+===============================================================================
+- Truncates the bronze tables before loading data.
+- Uses the `BULK INSERT` command to load data from csv Files to bronze tables.
+
+ Usage Example:
+    EXEC bronze.load_bronze;
+===============================================================================
+*/
+
 -- Bulk insertion with full load method of truncating & inserting
 
 CREATE OR ALTER PROCEDURE bronze.load_bronze AS
