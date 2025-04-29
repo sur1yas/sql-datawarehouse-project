@@ -2,7 +2,7 @@
 ===============================================================================
 StoredProcedure: Clean & Load Silver Layer (Bronze -> Silver)
 ===============================================================================
-- Truncate Silver tables.
+- Truncate Silver tables before loading data.
 - Insert transformed and cleansed data from Bronze into Silver tables.
 
  Usage Example:
