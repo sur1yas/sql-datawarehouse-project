@@ -27,7 +27,7 @@ SELECT
         WHEN ci.cst_gndr != 'n/a' THEN ci.cst_gndr           -- Primary source for gender = CRM
         ELSE COALESCE(ca.gen, 'n/a')  			                 -- Atcase refer ERP
     END                                AS gender,
-    ca.bdate                           AS birthdate,
+    ca.bdate                           AS birth_date,
     ci.cst_create_date                 AS create_date
 FROM silver.crm_cust_info ci
 LEFT JOIN silver.erp_cust_az12 ca
@@ -72,8 +72,8 @@ GO
 CREATE VIEW gold.fact_sales AS
 SELECT
     sd.sls_ord_num  AS order_number,
-    pr.product_key  AS product_key,                          -- Foreign Key(dim_products -> surrogate key)
-    cu.customer_key AS customer_key,                         -- Foreign Key(dim_customers -> surrogate key)
+    pr.product_key  AS product_key,                          -- Foreign Key(dim_products -> surrogate key)(connecting the Dim w Fact)
+    cu.customer_key AS customer_key,                         -- Foreign Key(dim_customers -> surrogate key)(connecting the Dim w Fact)
     sd.sls_order_dt AS order_date,
     sd.sls_ship_dt  AS shipping_date,
     sd.sls_due_dt   AS due_date,
@@ -81,8 +81,8 @@ SELECT
     sd.sls_quantity AS quantity,
     sd.sls_price    AS price
 FROM silver.crm_sales_details sd
-LEFT JOIN gold.dim_products pr                               -- Data Lookup ie connecting the Dim w Fact
+LEFT JOIN gold.dim_products pr                               -- Data Lookup 
     ON sd.sls_prd_key = pr.product_number                    
-LEFT JOIN gold.dim_customers cu                              -- Data Lookup ie connecting the Dim w Fact
+LEFT JOIN gold.dim_customers cu                              -- Data Lookup
     ON sd.sls_cust_id = cu.customer_id;
 GO
