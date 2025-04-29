@@ -12,9 +12,8 @@ StoredProcedure: Clean & Load Silver Layer (Bronze -> Silver)
 
 CREATE OR ALTER PROCEDURE silver.load_silver AS
 BEGIN
-	
 	  DECLARE @start_time DATETIME, @end_time DATETIME, 
-			  @batch_start_time DATETIME, @batch_end_time DATETIME; 
+		  @batch_start_time DATETIME, @batch_end_time DATETIME; 
 
 	  BEGIN TRY
 
@@ -52,20 +51,20 @@ BEGIN
   				WHEN 'S' THEN 'Single'
   				WHEN 'M' THEN 'Married'
   				ELSE 'N/A'
-  			END cst_marital_status,							-- Normalisation & Standardisation
-  			CASE UPPER(TRIM(cst_gndr))						-- Handling missing data
+  			END cst_marital_status,					-- Normalisation & Standardisation
+  			CASE UPPER(TRIM(cst_gndr))				-- Handling missing data
   				WHEN 'M' THEN 'Male'
   				WHEN 'F' THEN 'Female'
   				ELSE 'N/A'
-  			END cst_gndr,									-- Normalisation & Standardisation (Friendly format)
+  			END cst_gndr,						-- Normalisation & Standardisation (Friendly format)
   			cst_create_date
   		FROM(
-  			SELECT *,											-- Eliminate duplicates 
+  			SELECT *,						-- Eliminate duplicates 
   				ROW_NUMBER() OVER(PARTITION BY cst_id ORDER BY cst_create_date DESC) flag_last
   			FROM bronze.crm_cust_info
   			WHERE cst_id IS NOT NULL
   		)t
-  		WHERE flag_last = 1;									-- Filtering			
+  		WHERE flag_last = 1;						-- Filtering			
   
   		SET @end_time = GETDATE();
   
@@ -93,11 +92,11 @@ BEGIN
   				prd_end_dt
   		)
   		SELECT prd_id,
-  			REPLACE(SUBSTRING(TRIM(prd_key),1,5),'-','_') AS cat_id,			-- Extract category ID
-  			SUBSTRING(prd_key,7,LEN(prd_key)) AS prd_key,						-- Extract product key 
+  			REPLACE(SUBSTRING(TRIM(prd_key),1,5),'-','_') AS cat_id,	-- Extract category ID
+  			SUBSTRING(prd_key,7,LEN(prd_key)) AS prd_key,			-- Extract product key 
   			prd_nm,
-  			COALESCE(prd_cost,0) AS prd_cost,									-- Handling missing data
-  			CASE UPPER(TRIM(prd_line))											-- Data Normalization
+  			COALESCE(prd_cost,0) AS prd_cost,				-- Handling missing data
+  			CASE UPPER(TRIM(prd_line))					-- Data Normalization
   				WHEN 'M' THEN 'Mountain'
   				WHEN 'R' THEN 'Roads'
   				WHEN 'T' THEN 'Touring'
@@ -105,7 +104,7 @@ BEGIN
   				ELSE 'N/A'
   			END AS prd_line,
   			CAST(prd_start_dt AS DATE) AS prd_start_dt,
-  			CASE WHEN prd_start_dt > prd_end_dt									-- Data Enrichment
+  			CASE WHEN prd_start_dt > prd_end_dt				-- Data Enrichment
   				THEN DATEADD(day,-1,LEAD(prd_start_dt) OVER(PARTITION BY prd_key ORDER BY prd_start_dt)) 
   				ELSE prd_end_dt
   			END AS prd_end_dt -- Calculating end date as 1day prior to next start date
@@ -153,13 +152,13 @@ BEGIN
   				WHEN sls_sales IS NULL OR sls_sales <=0 OR sls_sales != sls_quantity * ABS(sls_price)
   					THEN sls_quantity * ABS(sls_price)
   				ELSE sls_sales
-  			END AS sls_sales,													-- Valid data validation				
+  			END AS sls_sales,							-- Valid data validation				
   			sls_quantity,
   			CASE 
   				WHEN sls_price IS NULL OR sls_price <=0
   					THEN sls_sales / NULLIF(sls_quantity,0)
   				ELSE sls_price
-  			END AS sls_price													-- Valid data validation
+  			END AS sls_price							-- Valid data validation
   		FROM bronze.crm_sales_details;
   
   		SET @end_time = GETDATE();
@@ -184,16 +183,16 @@ BEGIN
   				gen
   		)
   		SELECT
-  			CASE LEN(cid)														-- Data Matching
+  			CASE LEN(cid)								-- Data Matching
   				WHEN 13 THEN SUBSTRING(TRIM(cid), 4, LEN(cid))
   				ELSE cid
   			END AS cid,
-  			CASE																-- Eliminate future birthdates
+  			CASE									-- Eliminate future birthdates
   				WHEN bdate > GETDATE() THEN NULL
   				ELSE bdate														
   			END AS bdate,															
-  			CASE																-- Data Normalization & handling unknown values
-  				WHEN UPPER(TRIM(gen)) IN ('F','FEMALE') THEN 'Female'
+  			CASE									-- Data Normalization 
+  				WHEN UPPER(TRIM(gen)) IN ('F','FEMALE') THEN 'Female'		--Handling unknown values
   				WHEN UPPER(TRIM(gen)) IN ('M','MALE') THEN 'Male'
   				ELSE 'N/A'
   			END AS gen
@@ -219,14 +218,14 @@ BEGIN
   				cntry
   		)
   		SELECT
-  			REPLACE(cid, '-', '') AS cid,										-- Data matching over Keys
+  			REPLACE(cid, '-', '') AS cid,						-- Data matching over Keys
   			CASE 
   				WHEN TRIM(cntry) IN ('USA','US') THEN 'United States'
   				WHEN TRIM(cntry) = 'DE' THEN 'Germany'
-  				WHEN TRIM(cntry) = '' OR cntry IS NULL THEN 'N/A'
+  				WHEN TRIM(cntry) = '' OR cntry IS NULL THEN 'N/A'		-- Handling missing data
   				ELSE TRIM(cntry)
-  			END AS cntry														-- Data Normalizationand handling missing data
-  		FROM bronze.erp_loc_a101;
+  			END AS cntry								-- Data Normalizationand 
+  		FROM bronze.erp_loc_a101;							
   
   		SET @end_time = GETDATE();
   
