@@ -5,8 +5,7 @@ StoredProcedure: Clean & Load Silver Layer (Bronze -> Silver)
 - Truncate Silver tables before loading data.
 - Insert transformed and cleansed data from Bronze into Silver tables.
 
- Usage Example:
-    EXEC silver.load_silver;
+EXEC silver.load_silver;
 ===============================================================================
 */
 
@@ -17,10 +16,10 @@ BEGIN
 
 	  BEGIN TRY
 
-		  SET @batch_start_time = GETDATE();
+		SET @batch_start_time = GETDATE();
 		
   		PRINT '======================================';
-  		PRINT '	       LOADING SILVER LAYER 		 ';
+  		PRINT '	       LOADING SILVER LAYER 	     ';
   		PRINT '======================================';
   		PRINT '';
   		PRINT '************ CRM TABLES **************';
@@ -258,9 +257,14 @@ BEGIN
   
   		PRINT 'LoadTime: ' + CAST(DATEDIFF(second,@start_time,@end_time) AS NVARCHAR) + ' seconds';
   		PRINT '---------------------------------------';
-  
-  	END TRY
-  	BEGIN CATCH
+
+		SET @batch_end = GETDATE();
+
+		PRINT 'SilverLayerLoaded';
+		PRINT 'BatchLoadTime: ' + CAST(DATEDIFF(second,@batch_start,@batch_end) AS NVARCHAR) + ' seconds';
+
+  	END TRY						-- SQL runs TRY block exclusively
+	BEGIN CATCH					-- On failure, runs the CATCH block to handle error 
   		PRINT '=========================================='
   		PRINT 'ERROR OCCURED DURING LOADING BRONZE LAYER'
   		PRINT 'Error Message' + ERROR_MESSAGE();
