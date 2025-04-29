@@ -2,10 +2,9 @@
 ===============================================================================
 DDL Script: Creating Silver Tables
 ===============================================================================
-Script Purpose:
-    This script creates tables in the 'silver' schema, dropping existing tables 
-    if they already exist.
-	Run this script to re-define the DDL structure of 'bronze' Tables
+Creates tables in the 'silver' schema, and drops table if already exist.
+The changes in few table structure from 'Bronze' to 'Silver' is completely 
+	rationale due to some dervied columns.
 ===============================================================================
 */
 
@@ -25,6 +24,8 @@ CREATE TABLE silver.crm_cust_info(
 		dwh_create_date 	DATETIME2 DEFAULT GETDATE()
 );
 GO
+	
+------------------------------------------------------------------------------------------------
 
 -- Create crm_prd_info
 IF OBJECT_ID('silver.crm_prd_info','U') IS NOT NULL
@@ -44,6 +45,8 @@ CREATE TABLE silver.crm_prd_info(
 );
 GO
 
+------------------------------------------------------------------------------------------------
+	
 -- Create crm_sales_details
 IF OBJECT_ID('silver.crm_sales_details','U') IS NOT NULL
 		DROP TABLE silver.crm_sales_details:
@@ -63,6 +66,8 @@ CREATE TABLE silver.crm_sales_details(
 );
 GO
 
+------------------------------------------------------------------------------------------------
+	
 -- Create erp_cust_az12
 IF OBJECT_ID('silver.erp_cust_az12','U') IS NOT NULL
 		DROP TABLE silver.erp_cust_az12;
@@ -76,6 +81,8 @@ CREATE TABLE silver.erp_cust_az12(
 );
 GO
 
+------------------------------------------------------------------------------------------------
+	
 -- Create erp_loc_a101
 IF OBJECT_ID('silver.erp_loc_a101','U') IS NOT NULL
 		DROP TABLE silver.erp_loc_a101;
@@ -88,6 +95,8 @@ CREATE TABLE silver.erp_loc_a101(
 );
 GO
 
+------------------------------------------------------------------------------------------------
+	
 -- Create erp_px_cat_g1v2
 IF OBJECT_ID('silver.erp_px_cat_g1v2','U') IS NOT NULL
 		DROP TABLE silver.erp_px_cat_g1v2;
@@ -100,3 +109,5 @@ CREATE TABLE silver.erp_px_cat_g1v2(
 		maintenance		NVARCHAR(50),
 		dwh_create_date 	DATETIME2 DEFAULT GETDATE()
 );
+
+------------------------------------------------------------------------------------------------
