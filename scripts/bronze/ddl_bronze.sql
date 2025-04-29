@@ -1,4 +1,11 @@
--- Naming convention: Schema.Source_Filename
+/*
+===============================================================================
+DDL Script: Creating Bronze Tables
+===============================================================================
+Creates tables in the 'bronze' schema, and drops if table already exist.
+Naming convention: schema.source_filename	
+===============================================================================
+*/
 
 -- Create crm_cust_info
 IF OBJECT_ID('bronze.crm_cust_info','U') IS NOT NULL
